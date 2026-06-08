@@ -1,62 +1,62 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const SECTIONS = ['hero', 'profile', 'employment', 'projects', 'client-work', 'financial', 'education', 'certifications']
+const SECTIONS = ['hero', 'profile', 'employment', 'projects', 'clients', 'finance', 'education', 'certifications']
 
 export default function ScrollDots() {
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [active, setActive] = useState('hero')
   const [visible, setVisible] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setVisible(true)
-      if (timerRef.current) clearTimeout(timerRef.current)
-      timerRef.current = setTimeout(() => setVisible(false), 1500)
+    let hideTimer: ReturnType<typeof setTimeout>
 
-      // Find active section
-      const scrollY = window.scrollY + window.innerHeight / 3
-      let activeIdx = 0
-      SECTIONS.forEach((id, i) => {
-        const el = document.getElementById(id)
-        if (el && el.offsetTop <= scrollY) activeIdx = i
-      })
-      setActiveIndex(activeIdx)
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id)
+            setVisible(true)
+            clearTimeout(hideTimer)
+            hideTimer = setTimeout(() => setVisible(false), 2000)
+          }
+        })
+      },
+      { threshold: 0.4 }
+    )
+
+    SECTIONS.forEach(id => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+
+    return () => {
+      observer.disconnect()
+      clearTimeout(hideTimer)
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   return (
-    <div
-      className="fixed right-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3 transition-opacity duration-500"
-      style={{ opacity: visible ? 1 : 0 }}
+    <nav
+      className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2"
+      style={{
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.4s ease',
+      }}
     >
-      {SECTIONS.map((id, i) => (
+      {SECTIONS.map(id => (
         <button
           key={id}
-          onClick={() => scrollTo(id)}
-          aria-label={`Scroll to ${id}`}
-          className="block transition-all duration-300"
+          onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
+          aria-label={id}
+          className="block rounded-full transition-all duration-300"
           style={{
-            width: activeIndex === i ? 8 : 4,
-            height: activeIndex === i ? 8 : 4,
-            borderRadius: '50%',
-            backgroundColor: activeIndex === i ? '#0F6E56' : '#888888',
-            opacity: activeIndex === i ? 0.8 : 0.35,
-            boxShadow: activeIndex === i ? '0 0 6px rgba(15,110,86,0.6)' : 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
+            width: active === id ? '8px' : '6px',
+            height: active === id ? '8px' : '6px',
+            backgroundColor: active === id ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)',
+            transform: active === id ? 'scale(1.2)' : 'scale(1)',
           }}
         />
       ))}
-    </div>
+    </nav>
   )
 }

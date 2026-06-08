@@ -1,83 +1,76 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 interface LoadingScreenProps {
   onComplete: () => void
 }
 
 export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const startTimeRef = useRef<number>(0)
-  const rafRef = useRef<number>(0)
+  const [progress, setProgress] = useState(0)
+  const [done, setDone] = useState(false)
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const size = 160
-    canvas.width = size
-    canvas.height = size
-
-    const cx = size / 2
-    const cy = size / 2
-    const radius = 68
-    const lineWidth = 3
-    const duration = 2000
-
-    startTimeRef.current = performance.now()
-
-    function draw(now: number) {
-      const elapsed = now - startTimeRef.current
-      const progress = Math.min(elapsed / duration, 1)
-
-      ctx!.clearRect(0, 0, size, size)
-
-      // Track ring (dim)
-      ctx!.beginPath()
-      ctx!.arc(cx, cy, radius, 0, Math.PI * 2)
-      ctx!.strokeStyle = 'rgba(15,110,86,0.15)'
-      ctx!.lineWidth = lineWidth
-      ctx!.stroke()
-
-      // Progress ring
-      const startAngle = -Math.PI / 2
-      const endAngle = startAngle + Math.PI * 2 * progress
-      ctx!.beginPath()
-      ctx!.arc(cx, cy, radius, startAngle, endAngle)
-      ctx!.strokeStyle = '#0F6E56'
-      ctx!.lineWidth = lineWidth
-      ctx!.lineCap = 'round'
-      ctx!.stroke()
-
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(draw)
-      } else {
-        setTimeout(onComplete, 300)
-      }
-    }
-
-    rafRef.current = requestAnimationFrame(draw)
-    return () => cancelAnimationFrame(rafRef.current)
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          setTimeout(() => {
+            setDone(true)
+            setTimeout(onComplete, 600)
+          }, 200)
+          return 100
+        }
+        return prev + Math.random() * 15
+      })
+    }, 80)
+    return () => clearInterval(interval)
   }, [onComplete])
 
+  const circumference = 2 * Math.PI * 40
+  const strokeDashoffset = circumference - (Math.min(progress, 100) / 100) * circumference
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#0D0D0D] z-50">
-      <div className="relative" style={{ width: 160, height: 160 }}>
-        <canvas ref={canvasRef} className="absolute inset-0" style={{ width: 160, height: 160 }} />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="rounded-full overflow-hidden bg-[#1a1a1a]"
-            style={{ width: 120, height: 120 }}
-          >
-            {/* Placeholder — riyan.jpg will be dropped in */}
-            <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
-              <span className="text-[#888] text-xs">RA</span>
-            </div>
-          </div>
-        </div>
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-600"
+      style={{
+        backgroundColor: 'hsl(0 0% 3.9%)',
+        opacity: done ? 0 : 1,
+        pointerEvents: done ? 'none' : 'all',
+        transition: 'opacity 0.6s ease',
+      }}
+    >
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-[120px]" />
       </div>
+
+      <div className="relative flex items-center justify-center">
+        <svg width="100" height="100" className="-rotate-90">
+          {/* Track */}
+          <circle
+            cx="50" cy="50" r="40"
+            fill="none"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth="2"
+          />
+          {/* Progress */}
+          <circle
+            cx="50" cy="50" r="40"
+            fill="none"
+            stroke="rgba(255,255,255,0.8)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            style={{ transition: 'stroke-dashoffset 0.08s linear' }}
+          />
+        </svg>
+        <span className="absolute text-xs text-white/60 font-medium">
+          {Math.round(Math.min(progress, 100))}%
+        </span>
+      </div>
+
+      <p className="mt-6 text-xs text-white/30 tracking-widest uppercase">Loading</p>
     </div>
   )
 }

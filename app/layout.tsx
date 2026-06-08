@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Riyan Al-Ghamdi — Full Stack Developer',
-  description: 'Full Stack Developer · Technology Consultant · BSc Business Computing, Brunel University',
+  title: 'Riyan Al-Ghamdi — CV',
+  description: 'Full Stack Developer & Technology Consultant based in London.',
 }
 
 export default function RootLayout({
@@ -12,8 +13,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={GeistSans.variable}>
+      <body className="font-sans">
+        {children}
+      </body>
     </html>
   )
 }
