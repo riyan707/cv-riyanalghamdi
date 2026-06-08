@@ -26,7 +26,7 @@ export default function Header({ visible }: HeaderProps) {
                 src="/images/riyan.jpg"
                 fill
                 alt="Riyan Al-Ghamdi"
-                className="object-cover"
+                className="object-cover object-top"
                 sizes="32px"
               />
             </div>

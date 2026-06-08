@@ -249,7 +249,7 @@ export default function Home() {
                     src="/images/riyan.jpg"
                     fill
                     alt="Riyan Al-Ghamdi"
-                    className="object-cover"
+                    className="object-cover object-top"
                     sizes="64px"
                     priority
                   />
