@@ -135,10 +135,8 @@ const FINANCE_BULLETS = [
 const MODULES = ['Web Technologies','Database Systems','Software Engineering','Business Intelligence','Project Management','Entrepreneurship','Data Analytics','Systems Analysis']
 
 const CERTIFICATIONS = [
-  { name: 'HubSpot Inbound Marketing', issuer: 'HubSpot Academy', year: '2024' },
-  { name: 'Python for Everybody', issuer: 'Coursera / University of Michigan', year: '2023' },
-  { name: 'Google Analytics Fundamentals', issuer: 'Google', year: '2023' },
-  { name: 'Languages', issuer: 'English (Native) · Arabic (Conversational)', year: '' },
+  { name: 'Digital Marketing', issuer: 'HubSpot Academy (Certified)', year: '2024' },
+  { name: 'Languages', issuer: 'English (Native) · Arabic (Native)', year: '' },
 ]
 
 // ─── Components ─────────────────────────────────────────────────────────────
@@ -170,7 +168,7 @@ function ChipSecondary({ label }: { label: string }) {
 
 function ChipOutline({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/15 text-foreground px-2 py-0.5 text-[11px] font-medium">
+    <span className="inline-flex items-center rounded-full border border-white/15 text-foreground px-2 py-0.5 text-[11px] font-medium whitespace-nowrap flex-shrink-0">
       {label}
     </span>
   )
@@ -218,7 +216,7 @@ export default function Home() {
       {loaded && (
         <a
           href="/cv/Riyan_Al-Ghamdi_CV.pdf"
-          download
+          download="Riyan_Al-Ghamdi_CV.pdf"
           className="fixed bottom-6 right-6 z-40 bg-white/10 hover:bg-white/20 text-foreground border border-white/15 backdrop-blur rounded-full px-4 py-2 text-sm font-medium transition-colors"
         >
           Download CV
@@ -401,7 +399,7 @@ export default function Home() {
             <Card>
               <div className="flex items-start justify-between gap-2 mb-1">
                 <span className="font-semibold text-sm text-foreground">BSc Business Computing (2:1)</span>
-                <ChipOutline label="2020 – 2023" />
+                <ChipOutline label="Sep 2022 – Jun 2025" />
               </div>
               <p className="text-sm text-muted-foreground mb-4">Brunel University London</p>
               <div className="flex flex-wrap gap-1">
